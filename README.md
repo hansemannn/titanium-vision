@@ -1,7 +1,7 @@
 # iOS 11+ Vision in Titanium
 Use the native iOS 11+ "Vision" framework in Axway Titanium.
 
-| Original image | Processized image |
+| Original image | Processed image |
 |----------------|-------------------|
 | <img src="./screens/vision-before.PNG" width="300" alt="Before" /> | <img src="./screens/vision-after.PNG" width="300" alt="After" /> |
 
