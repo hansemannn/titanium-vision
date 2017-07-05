@@ -38,7 +38,7 @@
 
 #pragma Public APIs
 
-- (void)isSupported:(id)unused
+- (id)isSupported:(id)unused
 {
     return NUMBOOL([TiUtils isIOSVersionOrGreater:@"11.0"]);
 }
