@@ -1,0 +1,18 @@
+#
+# this is your module manifest and used by Titanium
+# during compilation, packaging, distribution, etc.
+#
+version: 1.0.0
+apiversion: 2
+architectures: armv7 arm64 i386 x86_64
+description: titanium-vision
+author: Hans Knoechel
+license: Apache 2
+copyright: Copyright (c) 2017 by Axway Appcelerator
+
+# these should not be edited
+name: titanium-vision
+moduleid: ti.vision
+guid: f39ef2bb-26ef-409b-aad4-c9e70b1016b5
+platform: iphone
+minsdk: 6.2.0
