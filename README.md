@@ -13,7 +13,7 @@ Use the native iOS 11+ "Vision" framework in Axway Titanium.
 ### Methods
 
 #### `detectTextRectangles(args)`
-- `image` (String - _Required_)
+- `image` (String | Ti.Blob - _Required_)
 - `callback` (Function - _Required_)
 - `reportCharacterBoxes` (Boolean - _Optional_)
 

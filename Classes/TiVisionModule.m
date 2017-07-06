@@ -47,10 +47,18 @@
 {
 #if IS_IOS_11
     ENSURE_SINGLE_ARG(args, NSDictionary);
-    ENSURE_TYPE([args objectForKey:@"image"], NSString);
     ENSURE_TYPE([args objectForKey:@"callback"], KrollCallback);
     
-    UIImage *inputImage = [TiUtils image:[args objectForKey:@"image"] proxy:self];
+    id image = [args objectForKey:@"image"];
+    UIImage *inputImage = nil;
+    
+    if ([image isKindOfClass:[NSString class]] || [image isKindOfClass:[TiBlob class]]) {
+        inputImage = [TiUtils image:[args objectForKey:@"image"] proxy:self];
+    } else {
+        [self throwException:@"Invalid type provided" subreason:@"Please pass either a String or a Ti.Blob." location:CODELOCATION];
+        return;
+    }
+    
     KrollCallback *callback = (KrollCallback *)[args objectForKey:@"callback"];
     BOOL reportCharacterBoxes = [TiUtils boolValue:@"reportCharacterBoxes" properties:args def:NO];
     
