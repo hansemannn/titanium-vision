@@ -17,6 +17,10 @@ Use the native iOS 11+ "Vision" framework in Axway Titanium.
 - `callback` (Function - _Required_)
 - `reportCharacterBoxes` (Boolean - _Optional_)
 
+#### `detectFaceRectangles(args)`
+- `image` (String | Ti.Blob - _Required_)
+- `callback` (Function - _Required_)
+
 ## Example
 ```js
 var Vision = require('ti.vision');
