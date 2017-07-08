@@ -80,9 +80,9 @@
             [dictionary setObject:[TiVisionUtilities dictionaryFromBoundingBox:observation.boundingBox andImageWidth:inputImage.size.width]
                            forKey:@"boundingBox"];
             
-//            if ([observation landmarks] != nil) {
-//                [dictionary setObject:[TiVisionUtilities dictionaryFromLandmarks:[observation landmarks]] forKey:@"landmarks"];
-//            }
+            if ([observation landmarks] != nil) {
+                [dictionary setObject:[TiVisionUtilities dictionaryFromLandmarks:[observation landmarks]] forKey:@"landmarks"];
+            }
         }
         
         NSMutableDictionary *event = [NSMutableDictionary dictionaryWithDictionary:@{
