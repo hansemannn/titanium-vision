@@ -51,6 +51,7 @@
     ENSURE_TYPE([args objectForKey:@"callback"], KrollCallback);
     
     id image = [args objectForKey:@"image"];
+    id regionOfInterest = [args objectForKey:@"regionOfInterest"];
     UIImage *inputImage = nil;
     
     if ([image isKindOfClass:[NSString class]] || [image isKindOfClass:[TiBlob class]]) {
@@ -93,6 +94,10 @@
         [callback call:@[event] thisObject:self];
     }];
     
+    if (regionOfInterest != nil) {
+        request.regionOfInterest = [TiUtils rectValue:regionOfInterest];
+    }
+        
     VNImageRequestHandler *handler = [[VNImageRequestHandler alloc] initWithCGImage:inputImage.CGImage options:@{}];
     [handler performRequests:@[request] error:&requestHandlerError];
     
@@ -118,6 +123,7 @@
     ENSURE_TYPE([args objectForKey:@"callback"], KrollCallback);
     
     id image = [args objectForKey:@"image"];
+    id regionOfInterest = [args objectForKey:@"regionOfInterest"];
     UIImage *inputImage = nil;
     
     if ([image isKindOfClass:[NSString class]] || [image isKindOfClass:[TiBlob class]]) {
@@ -169,6 +175,10 @@
     
     request.reportCharacterBoxes = reportCharacterBoxes;
     
+    if (regionOfInterest != nil) {
+        request.regionOfInterest = [TiUtils rectValue:regionOfInterest];
+    }
+
     VNImageRequestHandler *handler = [[VNImageRequestHandler alloc] initWithCGImage:inputImage.CGImage options:@{}];
     [handler performRequests:@[request] error:&requestHandlerError];
     
