@@ -144,8 +144,16 @@
         NSMutableArray<NSDictionary<NSString *, id> *> *observations = [NSMutableArray arrayWithCapacity:[[request results] count]];
         
         for (VNTextObservation *observation in (NSArray<VNTextObservation *> *)[request results]) {
+            
+            NSLog(@"Observation: %@", observation);
+            
             NSMutableDictionary *dictionary = [NSMutableDictionary dictionaryWithDictionary:@{
-                @"boundingBox": [TiVisionUtilities dictionaryFromBoundingBox:observation.boundingBox andImageWidth:inputImage.size.width]
+                  @"boundingBox": @{
+                    @"x": @(CGRectGetMinX(observation.boundingBox)),
+                    @"y": @(CGRectGetMinY(observation.boundingBox)),
+                    @"width": @(CGRectGetWidth(observation.boundingBox)),
+                    @"height": @(CGRectGetHeight(observation.boundingBox)),
+                 }
             }];
             
             if ([observation characterBoxes] != nil) {
@@ -156,8 +164,16 @@
                 }
                 
                 [dictionary setObject:characterBoxes forKey:@"characterBoxes"];
+                
+                
             }
+            
+            NSLog(@"Adding: %@", dictionary)
+            
+            [observations addObject:dictionary];
         }
+        
+        
         
         NSMutableDictionary *event = [NSMutableDictionary dictionaryWithDictionary:@{
             @"success": NUMBOOL(YES),
