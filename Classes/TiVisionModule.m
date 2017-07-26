@@ -113,7 +113,6 @@
         @"error": @"This API is iOS 11+ only, please guard using the \"isSupported()\" method and try again."
     }] thisObject:self];
 #endif
-    
 }
 
 - (void)detectTextRectangles:(id)args
@@ -151,7 +150,12 @@
         
         for (VNTextObservation *observation in (NSArray<VNTextObservation *> *)[request results]) {
             NSMutableDictionary *dictionary = [NSMutableDictionary dictionaryWithDictionary:@{
-                @"boundingBox": [TiVisionUtilities dictionaryFromBoundingBox:observation.boundingBox andImageWidth:inputImage.size.width]
+                  @"boundingBox": @{
+                    @"x": @(CGRectGetMinX(observation.boundingBox)),
+                    @"y": @(CGRectGetMinY(observation.boundingBox)),
+                    @"width": @(CGRectGetWidth(observation.boundingBox)),
+                    @"height": @(CGRectGetHeight(observation.boundingBox)),
+                 }
             }];
             
             if ([observation characterBoxes] != nil) {
@@ -163,8 +167,9 @@
                 
                 [dictionary setObject:characterBoxes forKey:@"characterBoxes"];
             }
+            [observations addObject:dictionary];
         }
-        
+
         NSMutableDictionary *event = [NSMutableDictionary dictionaryWithDictionary:@{
             @"success": NUMBOOL(YES),
             @"observations": observations
