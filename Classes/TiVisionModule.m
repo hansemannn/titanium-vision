@@ -113,7 +113,6 @@
         @"error": @"This API is iOS 11+ only, please guard using the \"isSupported()\" method and try again."
     }] thisObject:self];
 #endif
-    
 }
 
 - (void)detectTextRectangles:(id)args
@@ -170,9 +169,7 @@
             }
             [observations addObject:dictionary];
         }
-        
-        
-        
+
         NSMutableDictionary *event = [NSMutableDictionary dictionaryWithDictionary:@{
             @"success": NUMBOOL(YES),
             @"observations": observations
