@@ -16,10 +16,12 @@ Use the native iOS 11+ "Vision" framework in Axway Titanium.
 - `image` (String | Ti.Blob - _Required_)
 - `callback` (Function - _Required_)
 - `reportCharacterBoxes` (Boolean - _Optional_)
+- `regionOfInterest` (Object(x, y, width, height) - _Optional_)
 
 #### `detectFaceRectangles(args)`
 - `image` (String | Ti.Blob - _Required_)
 - `callback` (Function - _Required_)
+- `regionOfInterest` (Object(x, y, width, height) - _Optional_)
 
 ## Example
 ```js

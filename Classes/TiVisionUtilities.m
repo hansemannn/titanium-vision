@@ -26,7 +26,19 @@
 + (NSDictionary<NSString *, id> *)dictionaryFromLandmarks:(VNFaceLandmarks2D* )landmarks
 {
     return @{
-        @"allPoints": [TiVisionUtilities arrayFromLandmarkRegion:landmarks.allPoints]
+        @"allPoints": [TiVisionUtilities arrayFromLandmarkRegion:landmarks.allPoints],
+        @"faceContour": [TiVisionUtilities arrayFromLandmarkRegion:landmarks.faceContour],
+        @"leftEye": [TiVisionUtilities arrayFromLandmarkRegion:landmarks.leftEye],
+        @"rightEye": [TiVisionUtilities arrayFromLandmarkRegion:landmarks.rightEye],
+        @"leftPupil": [TiVisionUtilities arrayFromLandmarkRegion:landmarks.leftPupil],
+        @"rightPupil": [TiVisionUtilities arrayFromLandmarkRegion:landmarks.rightPupil],
+        @"leftEyebrow": [TiVisionUtilities arrayFromLandmarkRegion:landmarks.leftEyebrow],
+        @"rightEyebrow": [TiVisionUtilities arrayFromLandmarkRegion:landmarks.rightEyebrow],
+        @"nose": [TiVisionUtilities arrayFromLandmarkRegion:landmarks.nose],
+        @"noseCrest": [TiVisionUtilities arrayFromLandmarkRegion:landmarks.noseCrest],
+        @"medianLine": [TiVisionUtilities arrayFromLandmarkRegion:landmarks.medianLine],
+        @"outerLips": [TiVisionUtilities arrayFromLandmarkRegion:landmarks.outerLips],
+        @"innerLips": [TiVisionUtilities arrayFromLandmarkRegion:landmarks.innerLips]
     };
 }
 
@@ -40,14 +52,17 @@
     };
 }
 
-+ (NSArray<NSNumber *> *)arrayFromLandmarkRegion:(VNFaceLandmarkRegion2D *)landmarkRegion
++ (NSArray<NSDictionary<NSString *,  NSNumber*> *> *)arrayFromLandmarkRegion:(VNFaceLandmarkRegion2D *)landmarkRegion
 {
-    NSMutableArray<NSNumber *> *points = [NSMutableArray arrayWithCapacity:sizeof(landmarkRegion.points)];
+    NSMutableArray<NSDictionary<NSString *,  NSNumber*> *> *points = [NSMutableArray arrayWithCapacity:sizeof(landmarkRegion.points)];
     
-//    for (int i = 0; i < sizeof(landmarkRegion.points); i++) {
-//        [points addObject:[NSNumber numberWithFloat:landmarkRegion.points[i]];
-//    }
-    
+    for (int i = 0; i < sizeof(landmarkRegion.points); i++) {
+        [points addObject:@{
+            @"x": NUMFLOAT(landmarkRegion.points[i].x),
+            @"y": NUMFLOAT(landmarkRegion.points[i].y)
+        }];
+    }
+         
     return points;
 }
 

@@ -51,6 +51,7 @@
     ENSURE_TYPE([args objectForKey:@"callback"], KrollCallback);
     
     id image = [args objectForKey:@"image"];
+    id regionOfInterest = [args objectForKey:@"regionOfInterest"];
     UIImage *inputImage = nil;
     
     if ([image isKindOfClass:[NSString class]] || [image isKindOfClass:[TiBlob class]]) {
@@ -80,9 +81,9 @@
             [dictionary setObject:[TiVisionUtilities dictionaryFromBoundingBox:observation.boundingBox andImageWidth:inputImage.size.width]
                            forKey:@"boundingBox"];
             
-//            if ([observation landmarks] != nil) {
-//                [dictionary setObject:[TiVisionUtilities dictionaryFromLandmarks:[observation landmarks]] forKey:@"landmarks"];
-//            }
+            if ([observation landmarks] != nil) {
+                [dictionary setObject:[TiVisionUtilities dictionaryFromLandmarks:[observation landmarks]] forKey:@"landmarks"];
+            }
         }
         
         NSMutableDictionary *event = [NSMutableDictionary dictionaryWithDictionary:@{
@@ -93,6 +94,10 @@
         [callback call:@[event] thisObject:self];
     }];
     
+    if (regionOfInterest != nil) {
+        request.regionOfInterest = [TiUtils rectValue:regionOfInterest];
+    }
+        
     VNImageRequestHandler *handler = [[VNImageRequestHandler alloc] initWithCGImage:inputImage.CGImage options:@{}];
     [handler performRequests:@[request] error:&requestHandlerError];
     
@@ -118,6 +123,7 @@
     ENSURE_TYPE([args objectForKey:@"callback"], KrollCallback);
     
     id image = [args objectForKey:@"image"];
+    id regionOfInterest = [args objectForKey:@"regionOfInterest"];
     UIImage *inputImage = nil;
     
     if ([image isKindOfClass:[NSString class]] || [image isKindOfClass:[TiBlob class]]) {
@@ -185,6 +191,10 @@
     
     request.reportCharacterBoxes = reportCharacterBoxes;
     
+    if (regionOfInterest != nil) {
+        request.regionOfInterest = [TiUtils rectValue:regionOfInterest];
+    }
+
     VNImageRequestHandler *handler = [[VNImageRequestHandler alloc] initWithCGImage:inputImage.CGImage options:@{}];
     [handler performRequests:@[request] error:&requestHandlerError];
     
