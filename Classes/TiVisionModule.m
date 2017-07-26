@@ -46,23 +46,22 @@
 
 - (void)detectFaceRectangles:(id)args
 {
-#if IS_IOS_11
     ENSURE_SINGLE_ARG(args, NSDictionary);
     ENSURE_TYPE([args objectForKey:@"callback"], KrollCallback);
     
     id image = [args objectForKey:@"image"];
     id regionOfInterest = [args objectForKey:@"regionOfInterest"];
+    KrollCallback *callback = (KrollCallback *)[args objectForKey:@"callback"];
     UIImage *inputImage = nil;
-    
+    NSError *requestHandlerError = nil;
+
+#if IS_IOS_11
     if ([image isKindOfClass:[NSString class]] || [image isKindOfClass:[TiBlob class]]) {
         inputImage = [TiUtils image:[args objectForKey:@"image"] proxy:self];
     } else {
         [self throwException:@"Invalid type provided" subreason:@"Please pass either a String or a Ti.Blob." location:CODELOCATION];
         return;
     }
-    
-    KrollCallback *callback = (KrollCallback *)[args objectForKey:@"callback"];
-    NSError *requestHandlerError = nil;
     
     VNDetectFaceRectanglesRequest *request = [[VNDetectFaceRectanglesRequest alloc] initWithCompletionHandler:^(VNRequest *request, NSError *error) {
         if ([request results] == nil || [[request results] count] == 0) {
@@ -117,25 +116,23 @@
 
 - (void)detectTextRectangles:(id)args
 {
-#if IS_IOS_11
     ENSURE_SINGLE_ARG(args, NSDictionary);
     ENSURE_TYPE([args objectForKey:@"callback"], KrollCallback);
     
     id image = [args objectForKey:@"image"];
     id regionOfInterest = [args objectForKey:@"regionOfInterest"];
     UIImage *inputImage = nil;
+    KrollCallback *callback = (KrollCallback *)[args objectForKey:@"callback"];
+    NSError *requestHandlerError = nil;
+    BOOL reportCharacterBoxes = [TiUtils boolValue:@"reportCharacterBoxes" properties:args def:NO];
     
+#if IS_IOS_11
     if ([image isKindOfClass:[NSString class]] || [image isKindOfClass:[TiBlob class]]) {
         inputImage = [TiUtils image:[args objectForKey:@"image"] proxy:self];
     } else {
         [self throwException:@"Invalid type provided" subreason:@"Please pass either a String or a Ti.Blob." location:CODELOCATION];
         return;
     }
-    
-    KrollCallback *callback = (KrollCallback *)[args objectForKey:@"callback"];
-    BOOL reportCharacterBoxes = [TiUtils boolValue:@"reportCharacterBoxes" properties:args def:NO];
-    
-    NSError *requestHandlerError = nil;
     
     VNDetectTextRectanglesRequest *request = [[VNDetectTextRectanglesRequest alloc] initWithCompletionHandler:^(VNRequest *request, NSError *error) {
         if ([request results] == nil || [[request results] count] == 0) {
