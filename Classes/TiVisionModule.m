@@ -150,9 +150,6 @@
         NSMutableArray<NSDictionary<NSString *, id> *> *observations = [NSMutableArray arrayWithCapacity:[[request results] count]];
         
         for (VNTextObservation *observation in (NSArray<VNTextObservation *> *)[request results]) {
-            
-            NSLog(@"Observation: %@", observation);
-            
             NSMutableDictionary *dictionary = [NSMutableDictionary dictionaryWithDictionary:@{
                   @"boundingBox": @{
                     @"x": @(CGRectGetMinX(observation.boundingBox)),
@@ -170,12 +167,7 @@
                 }
                 
                 [dictionary setObject:characterBoxes forKey:@"characterBoxes"];
-                
-                
             }
-            
-            NSLog(@"Adding: %@", dictionary)
-            
             [observations addObject:dictionary];
         }
         
