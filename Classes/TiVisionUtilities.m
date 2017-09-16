@@ -54,12 +54,12 @@
 
 + (NSArray<NSDictionary<NSString *,  NSNumber*> *> *)arrayFromLandmarkRegion:(VNFaceLandmarkRegion2D *)landmarkRegion
 {
-    NSMutableArray<NSDictionary<NSString *,  NSNumber*> *> *points = [NSMutableArray arrayWithCapacity:sizeof(landmarkRegion.points)];
+    NSMutableArray<NSDictionary<NSString *,  NSNumber*> *> *points = [NSMutableArray arrayWithCapacity:sizeof(landmarkRegion.normalizedPoints)];
     
-    for (int i = 0; i < sizeof(landmarkRegion.points); i++) {
+    for (int i = 0; i < sizeof(landmarkRegion.normalizedPoints); i++) {
         [points addObject:@{
-            @"x": NUMFLOAT(landmarkRegion.points[i].x),
-            @"y": NUMFLOAT(landmarkRegion.points[i].y)
+            @"x": NUMFLOAT(landmarkRegion.normalizedPoints[i].x),
+            @"y": NUMFLOAT(landmarkRegion.normalizedPoints[i].y)
         }];
     }
          
