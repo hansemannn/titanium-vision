@@ -5,21 +5,17 @@
 //  Created by Hans Knöchel on 06.07.17.
 //
 
-#if IS_IOS_11
-
 #import "TiVisionUtilities.h"
-#import "TiBase.h"
-#import "TiHost.h"
 
 @implementation TiVisionUtilities
 
 + (NSDictionary<NSString*, id> *)dictionaryFromBoundingBox:(CGRect)boundingBox andImageWidth:(CGFloat)imageWidth
 {
     return @{
-        @"x": NUMFLOAT(boundingBox.origin.x * imageWidth),
-        @"y": NUMFLOAT(boundingBox.origin.y * imageWidth),
-        @"width": NUMFLOAT(boundingBox.size.width * imageWidth),
-        @"height": NUMFLOAT(boundingBox.size.height * imageWidth),
+        @"x": @(boundingBox.origin.x * imageWidth),
+        @"y": @(boundingBox.origin.y * imageWidth),
+        @"width": @(boundingBox.size.width * imageWidth),
+        @"height": @(boundingBox.size.height * imageWidth),
     };
 }
 
@@ -45,10 +41,10 @@
 + (NSDictionary<NSString *, id> *)dictionaryFromRectangle:(VNRectangleObservation* )rectangle
 {
     return @{
-        @"topLeft": @{@"x": NUMFLOAT(rectangle.topLeft.x), @"y": NUMFLOAT(rectangle.topLeft.y)},
-        @"topRight": @{@"x": NUMFLOAT(rectangle.topRight.x), @"y": NUMFLOAT(rectangle.topRight.y)},
-        @"bottomLeft": @{@"x": NUMFLOAT(rectangle.bottomLeft.x), @"y": NUMFLOAT(rectangle.bottomLeft.y)},
-        @"bottomRight": @{@"x": NUMFLOAT(rectangle.bottomRight.x), @"y": NUMFLOAT(rectangle.bottomRight.y)}
+        @"topLeft": @{@"x": @(rectangle.topLeft.x), @"y": @(rectangle.topLeft.y)},
+        @"topRight": @{@"x": @(rectangle.topRight.x), @"y": @(rectangle.topRight.y)},
+        @"bottomLeft": @{@"x": @(rectangle.bottomLeft.x), @"y": @(rectangle.bottomLeft.y)},
+        @"bottomRight": @{@"x": @(rectangle.bottomRight.x), @"y": @(rectangle.bottomRight.y)}
     };
 }
 
@@ -58,8 +54,8 @@
     
     for (int i = 0; i < sizeof(landmarkRegion.normalizedPoints); i++) {
         [points addObject:@{
-            @"x": NUMFLOAT(landmarkRegion.normalizedPoints[i].x),
-            @"y": NUMFLOAT(landmarkRegion.normalizedPoints[i].y)
+            @"x": @(landmarkRegion.normalizedPoints[i].x),
+            @"y": @(landmarkRegion.normalizedPoints[i].y)
         }];
     }
          
@@ -67,5 +63,3 @@
 }
 
 @end
-
-#endif

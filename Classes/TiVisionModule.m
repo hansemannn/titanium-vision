@@ -5,15 +5,12 @@
  * Copyright (c) 2017 Your Company. All rights reserved.
  */
 
-#if IS_IOS_11
 #import <Vision/Vision.h>
-#endif
+#import <VisionKit/VisionKit.h>
 
 #import "TiVisionModule.h"
-#import "TiBase.h"
-#import "TiHost.h"
-#import "TiUtils.h"
 #import "TiVisionUtilities.h"
+
 
 @implementation TiVisionModule
 
@@ -29,19 +26,75 @@
 	return @"ti.vision";
 }
 
-#pragma mark Lifecycle
-
--(void)startup
+- (void)_configure
 {
-	[super startup];
-	NSLog(@"[DEBUG] %@ loaded",self);
+  [super _configure];
+
+  dispatch_queue_attr_t qosAttribute = dispatch_queue_attr_make_with_qos_class(DISPATCH_QUEUE_CONCURRENT, QOS_CLASS_UTILITY, 0);
+  textRecognitionQueue = dispatch_queue_create("ti.vision.queue", qosAttribute);
+}
+
+- (void)_destroy
+{
+  [super _destroy];
+
+  textRecognitionQueue = nil;
 }
 
 #pragma Public APIs
 
-- (id)isSupported:(id)unused
+- (NSNumber *)isSupported:(id)unused
 {
-    return NUMBOOL([TiUtils isIOSVersionOrGreater:@"11.0"]);
+    return @([TiUtils isIOSVersionOrGreater:@"11.0"]);
+}
+
+- (void)recognizeText:(id)args
+{
+  ENSURE_SINGLE_ARG(args, NSDictionary);
+
+  __block UIImage *image = [TiUtils toImage:args[@"image"] proxy:self];
+  KrollCallback *callback = (KrollCallback *)args[@"callback"];
+
+  NSArray<NSString *> *customWords = args[@"customWords"];
+  NSArray<NSString *> *recognitionLanguages = args[@"recognitionLanguages"];
+  BOOL usesLanguageCorrection = [TiUtils boolValue:@"usesLanguageCorrection" properties:args def:YES];
+
+  if (image == nil || callback == nil) {
+    [self throwException:@"Missing image or callback" subreason:@"The image or callback is missing" location:CODELOCATION];
+  }
+
+  VNRecognizeTextRequest *textRecognitionRequest = [[VNRecognizeTextRequest alloc] initWithCompletionHandler:^(VNRequest * _Nonnull request, NSError * _Nullable error) {
+    NSArray<VNRecognizedTextObservation *> *observations = request.results;
+    NSMutableArray<NSString *> *results = [NSMutableArray arrayWithCapacity:observations.count];
+
+    [observations enumerateObjectsUsingBlock:^(VNRecognizedTextObservation * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+      VNRecognizedText *topCandidate = [obj topCandidates:1].firstObject;
+      [results addObject:topCandidate.string];
+    }];
+
+    [callback call:@[@{ @"success": @YES, @"results": results }] thisObject:self];
+  }];
+
+  textRecognitionRequest.usesLanguageCorrection = usesLanguageCorrection;
+
+  if (customWords != nil) {
+    textRecognitionRequest.customWords = customWords;
+  }
+
+  if (recognitionLanguages != nil) {
+    textRecognitionRequest.recognitionLanguages = recognitionLanguages;
+  }
+
+  dispatch_async(textRecognitionQueue, ^{
+    VNImageRequestHandler *requesHandler = [[VNImageRequestHandler alloc] initWithCGImage:image.CGImage options:@{}];
+    NSError *error = nil;
+  
+    [requesHandler performRequests:@[textRecognitionRequest] error:&error];
+    
+    if (error != nil) {
+      [callback call:@[@{ @"success": @NO, @"error": error.localizedDescription }] thisObject:self];
+    }
+  });
 }
 
 - (void)detectFaceRectangles:(id)args
@@ -55,7 +108,6 @@
     UIImage *inputImage = nil;
     NSError *requestHandlerError = nil;
 
-#if IS_IOS_11
     if ([image isKindOfClass:[NSString class]] || [image isKindOfClass:[TiBlob class]]) {
         inputImage = [TiUtils image:[args objectForKey:@"image"] proxy:self];
     } else {
@@ -66,7 +118,7 @@
     VNDetectFaceRectanglesRequest *request = [[VNDetectFaceRectanglesRequest alloc] initWithCompletionHandler:^(VNRequest *request, NSError *error) {
         if ([request results] == nil || [[request results] count] == 0) {
             [callback call:@[@{
-                 @"success": NUMBOOL(NO),
+                 @"success": @(NO),
                  @"error": [NSString stringWithFormat:@"%@ %@", @"Could not find any results.", [error localizedDescription]]
              }] thisObject:self];
             return;
@@ -86,7 +138,7 @@
         }
         
         NSMutableDictionary *event = [NSMutableDictionary dictionaryWithDictionary:@{
-            @"success": NUMBOOL(YES),
+            @"success": @(YES),
             @"observations": observations
         }];
         
@@ -102,16 +154,10 @@
     
     if (requestHandlerError != nil) {
         [callback call:@[@{
-            @"success": NUMBOOL(NO),
+            @"success": @(NO),
             @"error": [requestHandlerError localizedDescription]
         }] thisObject:self];
     }
-#else
-    [callback call:@[@{
-        @"success": NUMBOOL(NO),
-        @"error": @"This API is iOS 11+ only, please guard using the \"isSupported()\" method and try again."
-    }] thisObject:self];
-#endif
 }
 
 - (void)detectTextRectangles:(id)args
@@ -126,7 +172,6 @@
     NSError *requestHandlerError = nil;
     BOOL reportCharacterBoxes = [TiUtils boolValue:@"reportCharacterBoxes" properties:args def:NO];
     
-#if IS_IOS_11
     if ([image isKindOfClass:[NSString class]] || [image isKindOfClass:[TiBlob class]]) {
         inputImage = [TiUtils image:[args objectForKey:@"image"] proxy:self];
     } else {
@@ -137,7 +182,7 @@
     VNDetectTextRectanglesRequest *request = [[VNDetectTextRectanglesRequest alloc] initWithCompletionHandler:^(VNRequest *request, NSError *error) {
         if ([request results] == nil || [[request results] count] == 0) {
             [callback call:@[@{
-                @"success": NUMBOOL(NO),
+                @"success": @(NO),
                 @"error": [NSString stringWithFormat:@"%@ %@", @"Could not find any results.", [error localizedDescription]]
             }] thisObject:self];
             return;
@@ -168,7 +213,7 @@
         }
 
         NSMutableDictionary *event = [NSMutableDictionary dictionaryWithDictionary:@{
-            @"success": NUMBOOL(YES),
+            @"success": @(YES),
             @"observations": observations
         }];
         
@@ -186,16 +231,10 @@
     
     if (requestHandlerError != nil) {
         [callback call:@[@{
-            @"success": NUMBOOL(NO),
+            @"success": @(NO),
             @"error": [requestHandlerError localizedDescription]
         }] thisObject:self];
     }
-#else
-    [callback call:@[@{
-        @"success": NUMBOOL(NO),
-        @"error": @"This API is iOS 11+ only, please guard using the \"isSupported()\" method and try again."
-    }] thisObject:self];
-#endif
 }
 
 @end

@@ -5,9 +5,12 @@
  * Copyright (c) 2017 Your Company. All rights reserved.
  */
 
-#import "TiModule.h"
+#import <TitaniumKit/TitaniumKit.h>
 
-@interface TiVisionModule : TiModule
+@interface TiVisionModule : TiModule {
+  @private
+  dispatch_queue_t textRecognitionQueue;
+}
 
 /**
  * A request that will detect faces in an image.

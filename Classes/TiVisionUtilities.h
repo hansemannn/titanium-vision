@@ -5,8 +5,6 @@
 //  Created by Hans Knöchel on 06.07.17.
 //
 
-#if IS_IOS_11
-
 #import <Foundation/Foundation.h>
 #import <Vision/Vision.h>
 
@@ -21,5 +19,3 @@
 + (NSArray<NSNumber *> *)arrayFromLandmarkRegion:(VNFaceLandmarkRegion2D *)landmarkRegion;
 
 @end
-
-#endif

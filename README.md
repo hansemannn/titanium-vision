@@ -1,12 +1,12 @@
 # iOS 11+ Vision in Titanium
-Use the native iOS 11+ "Vision" framework in Axway Titanium.
+Use the native iOS 11+ "Vision" framework in Axway Titanium. Also includes iOS 13+ "VisionKit" API's.
 
 | Original image | Processed image |
 |----------------|-------------------|
 | <img src="./screens/vision-before.PNG" width="300" alt="Before" /> | <img src="./screens/vision-after.PNG" width="300" alt="After" /> |
 
 ## Requirements
-- [x] Titanium SDK 6.2.0 or later
+- [x] Titanium SDK 8.2.0 or later
 
 ## API's
 
@@ -22,6 +22,13 @@ Use the native iOS 11+ "Vision" framework in Axway Titanium.
 - `image` (String | Ti.Blob - _Required_)
 - `callback` (Function - _Required_)
 - `regionOfInterest` (Object(x, y, width, height) - _Optional_)
+
+#### `recognizeText(args)`
+- `image` (String | Ti.Blob - _Required_)
+- `callback` (Function - _Required_)
+- `customWords` (Array<String> - _Optional_)
+- `recognitionLanguages` (Array<String> - _Optional_)
+- `usesLanguageCorrection` (Boolean - _Optional_)
 
 ## Example
 ```js
@@ -58,11 +65,13 @@ win.open();
 
 ## Build
 ```js
-cd iphone
-appc ti build -p ios --build-only
+ti build -p ios --build-only
 ```
 
-## Legal
+## Author
 
-This module is Copyright (c) 2017-Present by Appcelerator, Inc. All Rights Reserved. 
-Usage of this module is subject to the Terms of Service agreement with Appcelerator, Inc.  
+Hans Knöchel
+
+## License
+
+Apache 2.0

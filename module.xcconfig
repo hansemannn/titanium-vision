@@ -7,6 +7,5 @@
 // http://developer.apple.com/mac/library/documentation/DeveloperTools/Conceptual/XcodeBuildSystem/400-Build_Configurations/build_configs.html
 // 
 
-OTHER_LDFLAGS[sdk=iphoneos11*]=$(inherited) -framework Vision
-OTHER_LDFLAGS[sdk=iphonesimulator11*]=$(inherited) -framework Vision
+OTHER_LDFLAGS = $(inherited) -weak_framework Vision -weak_framework VisionKit
 
