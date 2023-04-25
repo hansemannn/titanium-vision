@@ -237,4 +237,91 @@
     }
 }
 
+- (void)detectRectangles:(id)args
+{
+    ENSURE_SINGLE_ARG(args, NSDictionary);
+    ENSURE_TYPE([args objectForKey:@"callback"], KrollCallback);
+
+    id image = [args objectForKey:@"image"];
+    KrollCallback *callback = (KrollCallback *)[args objectForKey:@"callback"];
+    UIImage *inputImage = nil;
+    NSError *requestHandlerError = nil;
+
+    NSInteger maximumObservations = [TiUtils intValue:@"maximumObservations" properties:args def:1];
+    CGFloat minimumAspectRatio = [TiUtils floatValue:@"minimumAspectRatio" properties:args def:0.5f];
+    CGFloat maximumAspectRatio = [TiUtils floatValue:@"maximumAspectRatio" properties:args def:1.0f];
+    CGFloat quadratureTolerance = [TiUtils floatValue:@"quadratureTolerance" properties:args def:30.0f];
+    CGFloat minimumSize = [TiUtils floatValue:@"minimumSize" properties:args def:0.2f];
+  
+    if (maximumObservations < 0) {
+      [self throwException:@"Invalid bounds provided for \"maximumObservations\"" subreason:@"Please pass a value greater or equal to 0" location:CODELOCATION];
+    }
+
+    if (minimumAspectRatio < 0 || minimumAspectRatio > 1) {
+      [self throwException:@"Invalid bounds provided for \"minimumAspectRatio\"" subreason:@"Please pass a value between 0.0 and 1.0" location:CODELOCATION];
+    }
+  
+    if (maximumAspectRatio < 0 || maximumAspectRatio > 1) {
+      [self throwException:@"Invalid bounds provided for \"maximumAspectRatio\"" subreason:@"Please pass a value between 0.0 and 1.0" location:CODELOCATION];
+    }
+
+    if (quadratureTolerance < 0 || quadratureTolerance > 45) {
+      [self throwException:@"Invalid bounds provided for \"quadratureTolerance\"" subreason:@"Please pass a value between 0 and 45" location:CODELOCATION];
+    }
+  
+    if (minimumSize < 0) {
+      [self throwException:@"Invalid bounds provided for \"minimumSize\"" subreason:@"Please pass a value between 0.0 and 1.0" location:CODELOCATION];
+    }
+
+    if ([image isKindOfClass:[NSString class]] || [image isKindOfClass:[TiBlob class]]) {
+        inputImage = [TiUtils image:[args objectForKey:@"image"] proxy:self];
+    } else {
+        [self throwException:@"Invalid type provided" subreason:@"Please pass either a String or a Ti.Blob." location:CODELOCATION];
+        return;
+    }
+
+    VNDetectRectanglesRequest *request = [[VNDetectRectanglesRequest alloc] initWithCompletionHandler:^(VNRequest *request, NSError *error) {
+        if ([request results] == nil || [[request results] count] == 0) {
+            [callback call:@[@{
+                @"success": @(NO),
+                @"error": [NSString stringWithFormat:@"%@ %@", @"Could not find any results.", [error localizedDescription]]
+            }] thisObject:self];
+            return;
+        }
+
+        NSMutableArray<NSDictionary<NSString *, id> *> *observations = [NSMutableArray arrayWithCapacity:[[request results] count]];
+
+        for (VNRectangleObservation *observation in (NSArray<VNRectangleObservation *> *)[request results]) {          
+            CGRect normalizedBoundingBox = observation.boundingBox;
+            CGSize imageSize = inputImage.size;
+            CGRect normalizedRectangle = VNImageRectForNormalizedRect(normalizedBoundingBox, imageSize.width, imageSize.height);
+
+            [observations addObject:[TiUtils rectToDictionary:normalizedRectangle]];
+        }
+
+        NSMutableDictionary *event = [NSMutableDictionary dictionaryWithDictionary:@{
+            @"success": @(YES),
+            @"observations": observations
+        }];
+
+        [callback call:@[event] thisObject:self];
+    }];
+  
+    request.minimumAspectRatio = minimumAspectRatio;
+    request.maximumAspectRatio = maximumAspectRatio;
+    request.quadratureTolerance = quadratureTolerance;
+    request.minimumSize = minimumSize;
+    request.maximumObservations = maximumObservations;
+
+    VNImageRequestHandler *handler = [[VNImageRequestHandler alloc] initWithCGImage:inputImage.CGImage options:@{}];
+    [handler performRequests:@[request] error:&requestHandlerError];
+
+    if (requestHandlerError != nil) {
+        [callback call:@[@{
+            @"success": @(NO),
+            @"error": [requestHandlerError localizedDescription]
+        }] thisObject:self];
+    }
+}
+
 @end

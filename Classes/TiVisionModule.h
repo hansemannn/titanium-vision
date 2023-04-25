@@ -28,4 +28,12 @@
  */
 - (void)detectTextRectangles:(id)args;
 
+/**
+ * A request that will rectangles regions in an image.
+ *
+ * @since 2.1.0
+ * @args The arguments passed to the text-detection.
+ */
+- (void)detectRectangles:(id)args;
+
 @end
