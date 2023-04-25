@@ -323,4 +323,13 @@
     }
 }
 
+- (NSDictionary *)imageRectForNormalizedRect:(id)args
+{
+  CGRect rect = [TiUtils rectValue:args[0]];
+  CGFloat imageWidth = [TiUtils floatValue:args[1]];
+  CGFloat imageHeight = [TiUtils floatValue:args[2]];
+
+  return [TiUtils rectToDictionary:VNImageRectForNormalizedRect(rect, imageWidth, imageHeight)];
+}
+
 @end
