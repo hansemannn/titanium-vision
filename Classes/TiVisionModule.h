@@ -36,12 +36,4 @@
  */
 - (void)detectRectangles:(id)args;
 
-/**
- * Returns a rectangle in (possibly non-integral) image coordinates that is projected from a rectangle in a normalized coordinate space.
- *
- * @since 2.1.0
- * @args The arguments passed to the util (rect, width and height)
- */
-- (NSDictionary *)imageRectForNormalizedRect:(id)args;
-
 @end

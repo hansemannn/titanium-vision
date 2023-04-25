@@ -1,12 +1,12 @@
-# iOS 11+ Vision in Titanium
-Use the native iOS 11+ "Vision" framework in Axway Titanium. Also includes iOS 13+ "VisionKit" API's.
+# iOS Vision / VisionKit in Titanium
+Use the native "Vision" and "VisionKit" frameworks in Titanium!
 
 | Original image | Processed image |
 |----------------|-------------------|
 | <img src="./screens/vision-before.PNG" width="300" alt="Before" /> | <img src="./screens/vision-after.PNG" width="300" alt="After" /> |
 
 ## Requirements
-- [x] Titanium SDK 8.2.0 or later
+- [x] Titanium SDK 10.0.0 or later
 
 ## API's
 
@@ -30,31 +30,45 @@ Use the native iOS 11+ "Vision" framework in Axway Titanium. Also includes iOS 1
 - `recognitionLanguages` (Array<String> - _Optional_)
 - `usesLanguageCorrection` (Boolean - _Optional_)
 
-## Example
-```js
-var Vision = require('ti.vision');
+#### `detectRectangles(args)`
+- `image` (String | Ti.Blob - _Required_)
+- `minimumAspectRatio` (Number - default 0.5)
+- `maximumAspectRatio` (Number - default 1.0)
+- `quadratureTolerance` (Number - default 30)
+- `minimumSize`:  (Number - default 0.2)
+- `maximumObservations`:  (Number - default 1)
+- `callback` (Function - _Required_)
 
-var win = Ti.UI.createWindow({
+### Examples
+
+#### detectTextRectangles
+
+```js
+import Vision from 'ti.vision';
+
+const win = Ti.UI.createWindow({
     backgroundColor: '#fff'
 });
 
-var btn = Ti.UI.createButton({
+const btn = Ti.UI.createButton({
     title: 'Recognize Image Rectangles'
 });
 
-btn.addEventListener('click', function() {
+btn.addEventListener('click', () => {
     if (!Vision.isSupported()) {
-        return Ti.API.error('Sorry dude, iOS 11+ only!');
+        Ti.API.error('Sorry dude, iOS 11+ only!');
+        return;
     }
     
     Vision.detectTextRectangles({
         image: 'image_sample_tr.png',
-        callback: function(e) {
-            if (!e.success) {
-                return Ti.API.error(e.error);
+        callback: event => {
+            if (!event.success) {
+                Ti.API.error(event.error);
+                return;
             }
             
-            Ti.API.info(e);
+            Ti.API.info(event);
         }
     });
 });
@@ -63,7 +77,49 @@ win.add(btn);
 win.open();
 ```
 
+#### detectRectangles
+
+```js
+import Vision from 'ti.vision';
+
+const win = Ti.UI.createWindow({
+    backgroundColor: '#fff'
+});
+
+const btn = Ti.UI.createButton({
+    title: 'Recognize Image Rectangles'
+});
+
+btn.addEventListener('click', () => {
+    if (!Vision.isSupported()) {
+        Ti.API.error('Sorry dude, iOS 11+ only!');
+        return;
+    }
+    
+    Vision.detectRectangles({
+            image: 'image_sample.png',
+            minimumAspectRatio: 0.5,
+            maximumAspectRatio: 1.0,
+            quadratureTolerance: 20,
+            minimumSize: 0.2,
+            maximumObservations: 1,
+            callback: event => {
+                if (!event.success) {
+                    Ti.API.error(event.error);
+                    return;
+                }
+
+                Ti.API.info(event);
+            }
+        });
+});
+
+win.add(btn);
+win.open();
+```
+
 ## Build
+
 ```js
 ti build -p ios --build-only
 ```
