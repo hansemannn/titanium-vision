@@ -293,8 +293,14 @@
 
         for (VNRectangleObservation *observation in (NSArray<VNRectangleObservation *> *)[request results]) {
             NSMutableDictionary *dictionary = [NSMutableDictionary dictionary];
+          
+            CGRect normalizedBoundingBox = observation.boundingBox;
+            CGSize imageSize = inputImage.size;
+            CGRect normalizedRectangle = VNImageRectForNormalizedRect(normalizedBoundingBox, imageSize.width, imageSize.height);
 
             [dictionary setObject:[TiVisionUtilities dictionaryFromRectangle:observation] forKey:@"rectangle"];
+            [dictionary setObject:[TiUtils rectToDictionary:normalizedRectangle] forKey:@"normalizedRectangle"];
+
             [observations addObject:dictionary];
         }
 
