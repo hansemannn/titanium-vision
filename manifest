@@ -2,12 +2,13 @@
 # this is your module manifest and used by Titanium
 # during compilation, packaging, distribution, etc.
 #
-version: 2.0.0
+version: 2.1.0
 apiversion: 2
-architectures: armv7 arm64 i386 x86_64
+architectures: arm64 x86_64
 description: titanium-vision
 author: Hans Knoechel
 license: Apache 2
+mac: false
 copyright: Copyright (c) 2017-present by Hans Knöchel
 
 # these should not be edited
@@ -15,4 +16,4 @@ name: titanium-vision
 moduleid: ti.vision
 guid: f39ef2bb-26ef-409b-aad4-c9e70b1016b5
 platform: iphone
-minsdk: 8.2.0
+minsdk: 11.0.0

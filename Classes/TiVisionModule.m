@@ -237,4 +237,58 @@
     }
 }
 
+- (void)detectRectangles:(id)args
+{
+    ENSURE_SINGLE_ARG(args, NSDictionary);
+    ENSURE_TYPE([args objectForKey:@"callback"], KrollCallback);
+
+    id image = [args objectForKey:@"image"];
+    KrollCallback *callback = (KrollCallback *)[args objectForKey:@"callback"];
+    UIImage *inputImage = nil;
+    NSError *requestHandlerError = nil;
+
+    if ([image isKindOfClass:[NSString class]] || [image isKindOfClass:[TiBlob class]]) {
+        inputImage = [TiUtils image:[args objectForKey:@"image"] proxy:self];
+    } else {
+        [self throwException:@"Invalid type provided" subreason:@"Please pass either a String or a Ti.Blob." location:CODELOCATION];
+        return;
+    }
+
+    VNDetectRectanglesRequest *request = [[VNDetectRectanglesRequest alloc] initWithCompletionHandler:^(VNRequest *request, NSError *error) {
+        if ([request results] == nil || [[request results] count] == 0) {
+            [callback call:@[@{
+                @"success": @(NO),
+                @"error": [NSString stringWithFormat:@"%@ %@", @"Could not find any results.", [error localizedDescription]]
+            }] thisObject:self];
+            return;
+        }
+
+        NSMutableArray<NSDictionary<NSString *, id> *> *observations = [NSMutableArray arrayWithCapacity:[[request results] count]];
+
+        for (VNRectangleObservation *observation in (NSArray<VNRectangleObservation *> *)[request results]) {
+            NSMutableDictionary *dictionary = [NSMutableDictionary dictionary];
+
+            [dictionary setObject:[TiVisionUtilities dictionaryFromRectangle:observation] forKey:@"rectangle"];
+            [observations addObject:dictionary];
+        }
+
+        NSMutableDictionary *event = [NSMutableDictionary dictionaryWithDictionary:@{
+            @"success": @(YES),
+            @"observations": observations
+        }];
+
+        [callback call:@[event] thisObject:self];
+    }];
+
+    VNImageRequestHandler *handler = [[VNImageRequestHandler alloc] initWithCGImage:inputImage.CGImage options:@{}];
+    [handler performRequests:@[request] error:&requestHandlerError];
+
+    if (requestHandlerError != nil) {
+        [callback call:@[@{
+            @"success": @(NO),
+            @"error": [requestHandlerError localizedDescription]
+        }] thisObject:self];
+    }
+}
+
 @end
